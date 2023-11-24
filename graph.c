@@ -229,9 +229,12 @@ int main(int argc, char *argv[])
 				printf("[2] Create a new connection between nodes\n");
 				printf("[3] Print a node\n");
 				printf("[4] Print all nodes\n");
+				printf("[5] Rename a node\n"); 
+				printf("[6] Delete a node [UNIMPLEMENTED]\n");
+				printf("[7] Delete a connection between nodes [UNIMPLEMENTED]\n");
 				break;
 		}
-		printf("[5] Exit\n");
+		printf("[8] Exit\n");
 
 		// act based on the user's input
 		printf("> ");
@@ -343,6 +346,36 @@ int main(int argc, char *argv[])
 				break;
 
 			case 5:
+				// display all nodes
+				printf("Select a node to rename:\n");
+				for(int i = 0; i < nodes_len; i++)
+				{
+					printf("[%d] %s\n", i, nodes[i]->name);
+				}
+
+				// select node to rename
+				printf("> ");
+				fgets(user_selection_string, 16, stdin);
+				user_selection_string[strlen(user_selection_string) - 1] = '\0';
+				source_index = strtoul(user_selection_string, &strtoul_ptr, 10);
+
+				// get new name for node
+				printf("Rename \"%s\" to: ", nodes[source_index]->name);
+				fgets(name, 32, stdin);
+				name[strlen(name) - 1] = '\0'; // remove the newline from the name
+				
+				// free memory for current name and then reassign value with new name
+				free(nodes[source_index]->name);
+				nodes[source_index]->name = strdup(name); // no malloc necessary, strdup() does this for you
+				break;
+
+			case 6:
+				break;
+
+			case 7:
+				break;
+
+			case 8:
 				continue_main_program = false;
 				break;
 
