@@ -1,0 +1,16 @@
+node,Bossier City
+node,Shreveport
+node,Ruston
+node,New Orleans
+edge,Bossier City,Shreveport,3
+edge,Bossier City,Ruston,78
+edge,Bossier City,New Orleans,318
+edge,Shreveport,Bossier City,3
+edge,Shreveport,Ruston,67
+edge,Shreveport,New Orleans,315
+edge,Ruston,Bossier City,78
+edge,Ruston,Shreveport,67
+edge,Ruston,New Orleans,314
+edge,New Orleans,Bossier City,318
+edge,New Orleans,Shreveport,315
+edge,New Orleans,Ruston,314
