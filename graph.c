@@ -81,6 +81,14 @@ bool graph_node_add_neighbor(graph_node *source, graph_node *destination, unsign
 	return true;
 }
 
+void display_all_nodes(graph_node **nodes, unsigned int nodes_len)
+{
+	for(int i = 0; i < nodes_len; i++)
+	{
+		printf("[%d] %s\n", i, nodes[i]->name);
+	}
+}
+
 int main(int argc, char *argv[])
 {
 	// buffer to hold all created nodes
@@ -108,6 +116,9 @@ int main(int argc, char *argv[])
 	unsigned int line_capacity = 40;
 	char *line = malloc(sizeof(char) * line_capacity);
 	char c = '0';
+
+	// used to go remove deleted nodes from neighbors buffer of other nodes
+	unsigned int secondary_source_index;
 
 	// create nodes and edges from input file, if one is provided
 	if(argc >= 2)
@@ -369,7 +380,68 @@ int main(int argc, char *argv[])
 				nodes[source_index]->name = strdup(name); // no malloc necessary, strdup() does this for you
 				break;
 
-			case 6:
+			case 6: // delete a node
+				// display all nodes
+				printf("Select a node to delete:\n");
+				display_all_nodes(nodes, nodes_len);
+
+				// select node to delete
+				printf("> ");
+				fgets(user_selection_string, 16, stdin);
+				user_selection_string[strlen(user_selection_string) - 1] = '\0';
+				source_index = strtoul(user_selection_string, &strtoul_ptr, 10);
+
+				// free memory used by name of selected node
+				free(nodes[source_index]->name);
+
+				// free memory used by neighbors and distances buffers used by selected node
+				// NOTICE: that the individual members are NOT freed, because this would mean deleting
+				//         additional nodes 
+				free(nodes[source_index]->neighbors);
+				free(nodes[source_index]->distances);
+
+				// shift down the elements of the all nodes array
+				free(nodes[source_index]);
+				
+				// shift is only necessary if it was NOT the last node that was deleted
+				for(int i = source_index; i < nodes_len - 1; i++)
+				{
+					nodes[i] = nodes[i+1];
+				}
+
+				nodes[nodes_len-1] = NULL;
+				nodes_len--;
+
+				// remove references to the node (if edge undeleted in neighbors buffer of other nodes,
+				// then they will just appear as null)	
+				// (1) determine where the node was in the neighbors buffer 
+				for(int i = 0; i < nodes_len; i++)
+				{
+					for(int j = 0; j < nodes[i]->neighbors_len; j++)
+					{
+						if(nodes[i]->neighbors[j]->name == NULL)
+						{
+							secondary_source_index = j;
+							break;
+						}
+					}
+					printf("DEBUG: source index found to be %u for node \"%s\"\n", secondary_source_index, nodes[i]->name);
+					if(secondary_source_index == nodes[i]->neighbors_len - 1)
+					{
+						nodes[i]->neighbors[secondary_source_index] = NULL;
+					}
+					else
+					{
+						printf("DEBUG: moving elements over from neighbors buffer.\n");
+						for(int k = secondary_source_index; k < nodes[i]->neighbors_len - 1; k++)
+						{
+							nodes[i]->neighbors[k] = nodes[i]->neighbors[k+1];
+							nodes[i]->distances[k] = nodes[i]->distances[k+1];
+						}
+					}
+					nodes[i]->neighbors_len--;
+					nodes[i]->distances_len--;
+				}
 				break;
 
 			case 7:
