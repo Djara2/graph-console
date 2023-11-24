@@ -241,7 +241,7 @@ int main(int argc, char *argv[])
 				printf("[3] Print a node\n");
 				printf("[4] Print all nodes\n");
 				printf("[5] Rename a node\n"); 
-				printf("[6] Delete a node [UNIMPLEMENTED]\n");
+				printf("[6] Delete a node\n"); 
 				printf("[7] Delete a connection between nodes [UNIMPLEMENTED]\n");
 				break;
 		}
