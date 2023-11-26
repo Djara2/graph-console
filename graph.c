@@ -45,10 +45,10 @@ graph_node* graph_node_create(char *name)
 bool graph_node_add_neighbor(graph_node *source, graph_node *destination, unsigned int distance)
 {
 	// ensure this node (identified by name) is not already in the neighbors -- if it is, then it cannot be added
-	printf("DEBUG: entering neighbor add for loop\n");
+	//printf("DEBUG: entering neighbor add for loop\n");
 	for(int i = 0; i < source->neighbors_len; i++)
 	{
-		printf("DEBUG: attempting name comparisons\n");
+		//printf("DEBUG: attempting name comparisons\n");
 		if(strcmp( (source->neighbors[i])->name, (destination->name) )== 0)
 		{
 			printf("A node by the name \"%s\" already exists as a connection to node \"%s\".\n", (destination->name), (source->name));
@@ -59,9 +59,9 @@ bool graph_node_add_neighbor(graph_node *source, graph_node *destination, unsign
 	// (1) allocate more memory if there is insufficient memory allocated to hold more neighbors
 	if(source->neighbors_len >= source->neighbors_capacity)
 	{
-		printf("DEBUG: more memory is needed for source node neighbors buffer.\n");
+		//printf("DEBUG: more memory is needed for source node neighbors buffer.\n");
 		source->neighbors_capacity *= 2;
-		printf("DEBUG: attempting realloc\n");
+		//printf("DEBUG: attempting realloc\n");
 		source->neighbors = realloc(source->neighbors, sizeof(graph_node*) * (source->neighbors_capacity));
 		if(source->neighbors == NULL)
 		{
@@ -69,7 +69,7 @@ bool graph_node_add_neighbor(graph_node *source, graph_node *destination, unsign
 			return false;
 		}
 	}
-	printf("DEBUG: more memory created for neighbors buffer OR no reallocation necessary\n");
+	//printf("DEBUG: more memory created for neighbors buffer OR no reallocation necessary\n");
 	// (2) insert destination node into the source's neighbors buffer
 	source->neighbors[source->neighbors_len] = destination;
 	(source->neighbors_len)++;
@@ -214,7 +214,7 @@ int main(int argc, char *argv[])
 					// defining several new edges in one line
 					else if(strcmp(tokens[0], "edges") == 0)
 					{  
-						printf("DEBUG: got these tokens:\n");
+						//printf("DEBUG: got these tokens:\n");
 						for(int i = 0; i < tokens_len; i++)
 						{
 							printf("%s\n", tokens[i]);
@@ -348,22 +348,22 @@ int main(int argc, char *argv[])
 				fgets(user_selection_string, 16, stdin);
 				user_selection_string[strlen(user_selection_string) - 1] = '\0';
 				source_index = strtoul(user_selection_string, &strtoul_ptr, 10);
-				printf("DEBUG: source_index = %u\n", source_index);
+				//printf("DEBUG: source_index = %u\n", source_index);
 
 				printf("Select a destination node: ");
 				fgets(user_selection_string, 16, stdin);
 				user_selection_string[strlen(user_selection_string) - 1] = '\0';
 				destination_index = strtoul(user_selection_string, &strtoul_ptr, 10);
-				printf("DEBUG: destination_index = %u\n", destination_index);
+				//printf("DEBUG: destination_index = %u\n", destination_index);
 				
 				// get distance between these two points
 				printf("Distance between %s and %s: ", nodes[source_index]->name, nodes[destination_index]->name);
 				fgets(user_selection_string, 16, stdin);
 				user_selection_string[strlen(user_selection_string) - 1] = '\0';
 				distance = strtoul(user_selection_string, &strtoul_ptr, 10);
-				printf("DEBUG: distance = %u\n", distance);
+				//printf("DEBUG: distance = %u\n", distance);
 
-				printf("DEBUG: attempting to add neighbor");
+				//printf("DEBUG: attempting to add neighbor");
 				// create edge between the two
 				graph_node_add_neighbor(nodes[source_index], nodes[destination_index], distance);
 				break;
@@ -481,14 +481,14 @@ int main(int argc, char *argv[])
 							break;
 						}
 					}
-					printf("DEBUG: source index found to be %u for node \"%s\"\n", secondary_source_index, nodes[i]->name);
+					//printf("DEBUG: source index found to be %u for node \"%s\"\n", secondary_source_index, nodes[i]->name);
 					if(secondary_source_index == nodes[i]->neighbors_len - 1)
 					{
 						nodes[i]->neighbors[secondary_source_index] = NULL;
 					}
 					else
 					{
-						printf("DEBUG: moving elements over from neighbors buffer.\n");
+						//printf("DEBUG: moving elements over from neighbors buffer.\n");
 						for(int k = secondary_source_index; k < nodes[i]->neighbors_len - 1; k++)
 						{
 							nodes[i]->neighbors[k] = nodes[i]->neighbors[k+1];
