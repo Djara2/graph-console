@@ -203,6 +203,51 @@ int main(int argc, char *argv[])
 						distance = strtoul(tokens[3], &strtoul_ptr, 10);
 						graph_node_add_neighbor(nodes[source_index], nodes[destination_index], distance);
 					}
+
+					// defining several new edges in one line
+					else if(strcmp(tokens[0], "edges") == 0)
+					{  
+						printf("DEBUG: got these tokens:\n");
+						for(int i = 0; i < tokens_len; i++)
+						{
+							printf("%s\n", tokens[i]);
+						}
+						// source node must already exist in the all nodes buffer
+						// -> find index of source node in all nodes buffer
+						for(int i = 0; i < nodes_len; i++)
+						{
+							if(strcmp(nodes[i]->name, tokens[1]) == 0)
+							{
+								source_index = i;
+								break;
+							}
+						}
+
+						// FIND THE DESTINATION NAME AND DISTANCE. 
+						// - Distances are always at an index following 2x+3 
+						//   with x on [0, inf) 
+						// - Destination names are always at an index 2x+1 with
+						//   x on [0, inf)
+						// ----------------------------------------------------
+						// NOTICE: here i is always the index of the DISTANCE 
+						//         and i-1 is the name of the node for which
+						//         the distance corresponds
+						for(int i = 3; i < tokens_len; i += 2)
+						{
+							// find index of destination node in all nodes buffer
+							for(int j = 0; j < nodes_len; j++) 
+							{
+								if(strcmp(nodes[j]->name, tokens[i-1]) == 0)
+								{
+									destination_index = j;
+									break;
+								}
+							}
+							// convert distance from str to long, create the connection
+							distance = strtoul(tokens[i], &strtoul_ptr, 10);
+							graph_node_add_neighbor(nodes[source_index], nodes[destination_index], distance);
+						}
+					}
 					else{}
 
 					// reset tokens buffer
@@ -226,7 +271,9 @@ int main(int argc, char *argv[])
 
 
 
-	// main program
+
+
+	// BEGIN SECTION :: main program
 	while(continue_main_program)
 	{
 		// display options menu
