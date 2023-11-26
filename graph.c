@@ -304,7 +304,7 @@ int main(int argc, char *argv[])
 		printf("[10] Exit\n");
 
 		// act based on the user's input
-		printf("> ");
+		printf("\n> ");
 		fgets(user_selection_string, 16, stdin);
 		user_selection_string[strlen(user_selection_string) - 1] = '\0';
 		user_selection = strtoul(user_selection_string, &strtoul_ptr, 10); // typecast string into unsigned int 
@@ -548,12 +548,12 @@ int main(int argc, char *argv[])
 				// display all nodes --- show user where they can go
 				if(current_node == NULL)
 				{
-					printf("Select a node for your starting point:\n");
+					printf("\nSelect a node for your starting point:\n");
 					display_all_nodes(nodes, nodes_len);
 				}
 				else
 				{
-					printf("Select a new stopping point:\n");
+					printf("\nSelect a new stopping point:\n");
 					// show all the neighbors that the current node has 
 					// (these are the only valid stopping points)
 					for(int i = 0; i < current_node->neighbors_len; i++)
@@ -584,7 +584,7 @@ int main(int argc, char *argv[])
 				}
 
 				// change node and print out route statistics
-				printf("Current node is now %s\n", current_node->name);
+				printf("\nCurrent node is now %s\n", current_node->name);
 				printf("Total distance traveled is now %u distance units.\n", total_distance_traveled);
 				printf("You have visited %u nodes.\n", nodes_visited);
 				break;
@@ -594,7 +594,7 @@ int main(int argc, char *argv[])
 				break;
 
 			default:
-				printf("Menu option %u is invalid. No such menu option.\n", user_selection);
+				printf("\nMenu option %u is invalid. No such menu option.\n", user_selection);
 		}
 		printf("\n");
 		user_selection = 0;

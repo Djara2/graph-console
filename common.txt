@@ -1,0 +1,14 @@
+node,home
+node,work
+node,convenience store
+node,walmart
+node,target
+node,guitar center
+node,bar
+node,james convenience store
+edges,home,work,6,convenience store,3,walmart,3,bar,6,guitar center,5,target,4
+edges,work,home,6,convenience store,3,walmart,3,james convenience store,4
+edges,convenience store,home,3,work,3,walmart,0,bar,4,guitar center,6,target,5
+edges,walmart,home,3,work,3,convenience store,0
+edges,bar,home,6,convenience store,4
+edges,james convenience store,work,4
