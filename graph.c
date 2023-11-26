@@ -122,6 +122,11 @@ int main(int argc, char *argv[])
 	// used to go remove deleted nodes from neighbors buffer of other nodes
 	unsigned int secondary_source_index;
 
+	// variables for handling simulated routes
+	unsigned int total_distance_traveled = 0;
+	unsigned int nodes_visited = 0;
+	graph_node *current_node = NULL;
+
 	// create nodes and edges from input file, if one is provided
 	if(argc >= 2)
 	{
@@ -293,9 +298,10 @@ int main(int argc, char *argv[])
 				printf("[6] Delete a node\n"); 
 				printf("[7] Delete a connection between nodes [UNIMPLEMENTED]\n");
 				printf("[8] Save current graph setup to a file\n");
+				printf("[9] Visit a new node\n");
 				break;
 		}
-		printf("[9] Exit\n");
+		printf("[10] Exit\n");
 
 		// act based on the user's input
 		printf("> ");
@@ -539,6 +545,51 @@ int main(int argc, char *argv[])
 				break; 
 
 			case 9:
+				// display all nodes --- show user where they can go
+				if(current_node == NULL)
+				{
+					printf("Select a node for your starting point:\n");
+					display_all_nodes(nodes, nodes_len);
+				}
+				else
+				{
+					printf("Select a new stopping point:\n");
+					// show all the neighbors that the current node has 
+					// (these are the only valid stopping points)
+					for(int i = 0; i < current_node->neighbors_len; i++)
+					{ 
+						printf("[%d] %s (distance = %u)\n", i, current_node->neighbors[i]->name, current_node->distances[i]);
+					}
+				}
+
+				// get selection of starting point/destination
+				printf("> ");
+				fgets(user_selection_string, 32, stdin);
+				user_selection_string[strlen(user_selection_string) - 1] = '\0';
+				user_selection = strtoul(user_selection_string, &strtoul_ptr, 10);
+
+				// make relevant routing change
+				// (1) if we have only just now selected a starting point
+				if(current_node == NULL)
+				{
+					current_node = nodes[user_selection];
+				}
+				// (2) we have a new destination, from a previous point 
+				else
+				{
+					total_distance_traveled += current_node->distances[user_selection];
+					nodes_visited++;
+					printf("Traveled from %s to %s. This trip was %u distance units\n", current_node->name, current_node->neighbors[user_selection]->name, current_node->distances[user_selection]);
+					current_node = current_node->neighbors[user_selection];
+				}
+
+				// change node and print out route statistics
+				printf("Current node is now %s\n", current_node->name);
+				printf("Total distance traveled is now %u distance units.\n", total_distance_traveled);
+				printf("You have visited %u nodes.\n", nodes_visited);
+				break;
+
+			case 10:
 				continue_main_program = false;
 				break;
 
