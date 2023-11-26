@@ -106,6 +106,8 @@ int main(int argc, char *argv[])
 	unsigned int distance;
 	bool continue_main_program = true;
 	bool file_opened_successfully = false;
+	char save_file_name[32];
+	FILE *save_file;
 
 	// variables for parsing source file (start with a graph, saved in a file)
 	unsigned int tokens_len = 0;
@@ -290,9 +292,10 @@ int main(int argc, char *argv[])
 				printf("[5] Rename a node\n"); 
 				printf("[6] Delete a node\n"); 
 				printf("[7] Delete a connection between nodes [UNIMPLEMENTED]\n");
+				printf("[8] Save current graph setup to a file\n");
 				break;
 		}
-		printf("[8] Exit\n");
+		printf("[9] Exit\n");
 
 		// act based on the user's input
 		printf("> ");
@@ -495,6 +498,47 @@ int main(int argc, char *argv[])
 				break;
 
 			case 8:
+				// get the name of the file to be saving to 
+				printf("Name of file to save graph to: ");
+				fgets(save_file_name, 32, stdin);
+				save_file_name[strlen(save_file_name) - 1] = '\0'; // remove the newline from the name
+				save_file = fopen(save_file_name, "w");
+
+				// cancel operation if file cannot be opened for some reason
+				if(save_file == NULL)
+				{
+					printf("Failed to create save file. File pointer returned NULL.\n");
+					break;
+				}
+
+				// go through all nodes an define them
+				for(int i = 0; i < nodes_len; i++)
+				{
+					fprintf(save_file, "node,%s\n", nodes[i]->name);
+				}
+
+				// go through all nodes again
+				// - we did not define neighbor nodes as we come across them
+				//   because this would accidentally cause defining nodes
+				//   multiple times
+				for(int i = 0; i < nodes_len; i++)
+				{
+					fprintf(save_file, "edges,%s", nodes[i]->name);
+
+					// go through all neighbors of the current node
+					for(int j = 0; j < nodes[i]->neighbors_len; j++)
+					{
+						fprintf(save_file, ",%s,%u", nodes[i]->neighbors[j]->name, nodes[i]->distances[j]);
+					}
+					// end the line
+					fprintf(save_file, "\n");
+				}
+
+				// close file
+				fclose(save_file);
+				break; 
+
+			case 9:
 				continue_main_program = false;
 				break;
 
