@@ -553,11 +553,13 @@ int main(int argc, char *argv[])
 	for(int i = 0; i < nodes_len; i++)
 	{
 		// clear the neighbors and distances buffers of the current node
-		for(int j = 0; j < nodes[i]->neighbors_len; j++)
-		{
-			free(nodes[i]->neighbors[j]);
-			free(nodes[i]->distances);
-		}
+		// - you only have to clear these buffers, not the individual elements
+		//   of these buffers, because doing so would actually preemptive delete
+		//   nodes, causing double-free error when i is incremented to the next
+		//   node. Just clear the buffer, then remove the node itself. The nodes
+		//   will still exist, but then get removed later as the outer loop continues
+		free(nodes[i]->neighbors);
+		free(nodes[i]->distances);
 
 		// actually free the current node
 		free(nodes[i]);
