@@ -33,3 +33,16 @@ The line `node,Bossier City` creates a node. The node is titled Bossier City and
 The line `edge,Bossier City,Shreveport,3` creates a unidirectional connection from the node titled Bossier City to the node titled Shreveport, with a distance of 3 between these two nodes.
 
 **Note:** ==decimal values are unsupported== at the moment.
+
+There is also a more compact syntax for achieving this, using the `edges` keyword instead of `edge`
+
+```
+node,Bossier City
+node,Shreveport
+node,Ruston
+node,New Orleans
+edges,Bossier City,Shreveport,3,Ruston,78,New Orleans,318
+edges,Shreveport,Bossier City,3,Ruston,67,New Orleans,315
+edges,Ruston,Bossier City,78,Shreveport,67,New Orleans,314
+edges,New Orleans,Bossier City,318,Shreveport,315,Ruston,314
+```
