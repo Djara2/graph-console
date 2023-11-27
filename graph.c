@@ -89,6 +89,14 @@ void display_all_nodes(graph_node **nodes, unsigned int nodes_len)
 	}
 }
 
+void display_all_node_neighbors(graph_node *node)
+{
+	for(int i = 0; i < node->neighbors_len; i++)
+	{
+		printf("[%d] %s\n", i, node->neighbors[i]->name);
+	}
+}
+
 int main(int argc, char *argv[])
 {
 	// buffer to hold all created nodes
@@ -445,11 +453,11 @@ int main(int argc, char *argv[])
 					// introduce the node
 					printf("Node \"%s\":\n", nodes[i]->name);
 
-					printf("\tConnections:\n");
+					printf("Connections:\n");
 					// print all the connections it has
 					for(int j = 0; j < nodes[i]->neighbors_len; j++) 
 					{
-						printf("\t\t[%d] %s --- distance: %f\n", j, (nodes[i])->neighbors[j]->name, (nodes[i])->distances[j]);
+						printf("[%d] %s (%.2f)\n", j, (nodes[i])->neighbors[j]->name, (nodes[i])->distances[j]);
 					}
 					printf("\n");
 				}
@@ -544,6 +552,43 @@ int main(int argc, char *argv[])
 				break;
 
 			case 7:
+				// display all the nodes to select a source node
+				printf("Please select a source node:");
+				display_all_nodes(nodes, nodes_len);
+				printf("\n> ");
+
+				// get the source node index
+				fgets(user_selection_string, 32, stdin);
+				// (1) remove newline
+				user_selection_string[strlen(user_selection_string) - 1] = '\0';
+				// (2) convert to unsigned int
+				source_index = strtoul(user_selection_string, &strtoul_ptr, 10);
+
+				// display all the neighbors for the selected node
+				printf("\nSelect a destination to disconnect from %s:\n", nodes[source_index]->name);
+				display_all_node_neighbors(nodes[source_index]);
+				printf("\n> ");
+
+				// get the destination node
+				fgets(user_selection_string, 32, stdin);
+				user_selection_string[strlen(user_selection_string) - 1] = '\0';  // remove newline from input buffer
+				destination_index = strtoul(user_selection_string, &strtoul_ptr, 10);
+
+				// shift everything to the left, from the destination index
+				// - shift is only necessary if it was NOT the last node that was deleted
+				for(int i = destination_index; i < nodes[source_index]->neighbors_len - 1; i++)
+				{
+					nodes[source_index]->neighbors[i] = nodes[source_index]->neighbors[i+1];
+					nodes[source_index]->distances[i] = nodes[source_index]->distances[i+1];
+				}
+
+				// set final element of buffer to NULL now that shift-down has occurred
+				nodes[source_index]->neighbors[nodes[source_index]->neighbors_len - 1] = NULL;
+				//nodes[source_index]->distances[nodes[source_index]->distances_len - 1] = NULL;
+
+				// len attributes of node should change to reflect removal of neighbor
+				nodes[source_index]->neighbors_len--;
+				nodes[source_index]->distances_len--;
 				break;
 
 			case 8:
@@ -568,7 +613,7 @@ int main(int argc, char *argv[])
 				}
 
 				// go through all nodes an define them
-				fprintf(save_file, "nodes,%s", nodes[0]);
+				fprintf(save_file, "nodes,%s", nodes[0]->name);
 				for(int i = 1; i < nodes_len; i++)
 				{
 					fprintf(save_file, ",\n\t%s", nodes[i]->name);
@@ -588,7 +633,7 @@ int main(int argc, char *argv[])
 					// go through all neighbors of the current node
 					for(int j = 0; j < nodes[i]->neighbors_len; j++)
 					{
-						fprintf(save_file, ",\n\t%s,%f", nodes[i]->neighbors[j]->name, nodes[i]->distances[j]);
+						fprintf(save_file, ",\n\t%s,%.2f", nodes[i]->neighbors[j]->name, nodes[i]->distances[j]);
 					}
 					// end the line
 					fprintf(save_file, ";\n");
