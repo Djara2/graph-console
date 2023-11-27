@@ -547,6 +547,13 @@ int main(int argc, char *argv[])
 				break;
 
 			case 8:
+				// ensure that there is actually a graph to save
+				if(nodes_len == 0)
+				{
+					printf("You do not have any nodes defined. There is no graph to be saved.\n");
+					break;
+				}
+
 				// get the name of the file to be saving to 
 				printf("Name of file to save graph to: ");
 				fgets(save_file_name, 32, stdin);
@@ -561,10 +568,14 @@ int main(int argc, char *argv[])
 				}
 
 				// go through all nodes an define them
-				for(int i = 0; i < nodes_len; i++)
+				fprintf(save_file, "nodes,%s", nodes[0]);
+				for(int i = 1; i < nodes_len; i++)
 				{
-					fprintf(save_file, "node,%s\n", nodes[i]->name);
+					fprintf(save_file, ",\n\t%s", nodes[i]->name);
 				}
+
+				// terminate statement
+				fprintf(save_file, ";\n");
 
 				// go through all nodes again
 				// - we did not define neighbor nodes as we come across them
@@ -577,10 +588,10 @@ int main(int argc, char *argv[])
 					// go through all neighbors of the current node
 					for(int j = 0; j < nodes[i]->neighbors_len; j++)
 					{
-						fprintf(save_file, ",%s,%f", nodes[i]->neighbors[j]->name, nodes[i]->distances[j]);
+						fprintf(save_file, ",\n\t%s,%f", nodes[i]->neighbors[j]->name, nodes[i]->distances[j]);
 					}
 					// end the line
-					fprintf(save_file, "\n");
+					fprintf(save_file, ";\n");
 				}
 
 				// close file

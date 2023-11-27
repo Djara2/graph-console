@@ -1,0 +1,37 @@
+nodes,home
+	apartment,
+	work,
+	erin,
+	sam,
+	roger,
+	circle k,
+	walmart,
+	target,
+	guitar center;
+
+edges,home,
+	erin,6.900000,
+	walmart,2.600000,
+	guitar center,4.600000,
+	circle k,2.600000;
+
+edges,apartment;
+edges,work;
+
+edges,erin,
+	home,6.900000;
+
+edges,sam;
+edges,roger;
+
+edges,circle k,
+	home,2.600000;
+
+edges,walmart,
+	home,2.600000,
+	guitar center,4.600000;
+
+edges,target,
+	home,4.300000;
+
+edges,guitar center;
