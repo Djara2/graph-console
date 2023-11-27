@@ -1,0 +1,6 @@
+node,home
+node,erin
+node,sam
+node,roger
+edge,home,erin,6.9
+edge,erin,home,6.9

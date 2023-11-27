@@ -1,0 +1,25 @@
+nodes,
+	home,
+	apartment,
+	work,
+	erin,
+	sam,
+	roger;
+
+nodes,
+	circle k,
+	walmart,
+	target,
+	guitar center;
+
+edges,home,
+	erin,6.9,
+	walmart,2.6,
+	guitar center,4.6;
+
+edges,erin,
+	home,6.9;
+
+edges,walmart,
+	home,2.6,
+	guitar center,4.6;

@@ -12,7 +12,7 @@ typedef struct graph_node
 	unsigned int neighbors_len;
 	unsigned int neighbors_capacity;
 
-	unsigned int *distances;
+	double *distances;
 	unsigned int distances_len;
 	unsigned int distances_capacity;
 
@@ -37,12 +37,12 @@ graph_node* graph_node_create(char *name)
 	// which node they want to go to in application, because... well how else would they?
 	node->distances_len = 0;
 	node->distances_capacity = 3;
-	node->distances = malloc(sizeof(unsigned int) * node->distances_capacity);
+	node->distances = malloc(sizeof(double) * node->distances_capacity);
 
 	return node;
 }
 
-bool graph_node_add_neighbor(graph_node *source, graph_node *destination, unsigned int distance)
+bool graph_node_add_neighbor(graph_node *source, graph_node *destination, double distance)
 {
 	// ensure this node (identified by name) is not already in the neighbors -- if it is, then it cannot be added
 	//printf("DEBUG: entering neighbor add for loop\n");
@@ -98,12 +98,13 @@ int main(int argc, char *argv[])
 
 	// variables for main program
 	char user_selection_string[16];
+	char *strtod_ptr;
 	char *strtoul_ptr;
 	unsigned int user_selection;
 	char name[32];
 	unsigned int source_index;
 	unsigned int destination_index;
-	unsigned int distance;
+	double distance;
 	bool continue_main_program = true;
 	bool file_opened_successfully = false;
 	char save_file_name[32];
@@ -123,7 +124,7 @@ int main(int argc, char *argv[])
 	unsigned int secondary_source_index;
 
 	// variables for handling simulated routes
-	unsigned int total_distance_traveled = 0;
+	double total_distance_traveled = 0.0;
 	unsigned int nodes_visited = 0;
 	graph_node *current_node = NULL;
 
@@ -147,7 +148,7 @@ int main(int argc, char *argv[])
 			{
 				c = fgetc(source_file);
 				// if a line is done, then a statement is done. 
-				if(c == '\n' || c == EOF)
+				if(c == ';' || c == EOF)
 				{
 					// terminate line
 					insert_char(&line, &line_len, &line_capacity, '\0');
@@ -195,6 +196,30 @@ int main(int argc, char *argv[])
 						nodes_len++;
 
 					}
+					// case: define several nodes in one statement
+					else if(strcmp(tokens[0], "nodes") == 0)
+					{
+						// go through all tokens, starting from index 1
+						// and define new nodes based on token values
+						for(int i = 1; i < tokens_len; i++)
+						{
+							// ensure there is sufficient space to store a new node in the nodes buffer
+							if(nodes_len >= nodes_capacity)
+							{
+								nodes_capacity *= 2;
+								nodes = realloc(nodes, sizeof(graph_node*) * nodes_capacity);
+								if(nodes == NULL)
+								{
+									perror("Failed to allocate more memory for all nodes buffer while creating new node from graph input file.");
+									return 1;
+								}
+							}
+
+							// add node to all nodes buffer
+							nodes[nodes_len] = graph_node_create(tokens[i]);
+							nodes_len++;
+						}
+					}
 					else if(strcmp(tokens[0], "edge") == 0)   // case: new edge between nodes
 					{
 						// nodes must already exist in the all nodes buffer
@@ -207,7 +232,8 @@ int main(int argc, char *argv[])
 						}
 
 						// convert distance from str to long, create the connection
-						distance = strtoul(tokens[3], &strtoul_ptr, 10);
+						//distance = strtoul(tokens[3], &strtoul_ptr, 10);
+						distance = strtod(tokens[3], &strtod_ptr);
 						graph_node_add_neighbor(nodes[source_index], nodes[destination_index], distance);
 					}
 
@@ -251,7 +277,8 @@ int main(int argc, char *argv[])
 								}
 							}
 							// convert distance from str to long, create the connection
-							distance = strtoul(tokens[i], &strtoul_ptr, 10);
+							//distance = strtoul(tokens[i], &strtoul_ptr, 10);
+							distance = strtod(tokens[i], &strtod_ptr);
 							graph_node_add_neighbor(nodes[source_index], nodes[destination_index], distance);
 						}
 					}
@@ -270,7 +297,22 @@ int main(int argc, char *argv[])
 					if(c == EOF) break;
 				}
 				// continue building the line
-				else insert_char(&line, &line_len, &line_capacity, c);
+				else
+				{
+					switch(c)
+					{
+						// just ignore newlines and tabs
+						case '\n':
+							break;
+					
+						case '\t':
+							break;
+
+						default:
+							insert_char(&line, &line_len, &line_capacity, c);
+							break;
+					}
+				}
 			}
 		}
 		fclose(source_file);
@@ -360,7 +402,8 @@ int main(int argc, char *argv[])
 				printf("Distance between %s and %s: ", nodes[source_index]->name, nodes[destination_index]->name);
 				fgets(user_selection_string, 16, stdin);
 				user_selection_string[strlen(user_selection_string) - 1] = '\0';
-				distance = strtoul(user_selection_string, &strtoul_ptr, 10);
+				//distance = strtoul(user_selection_string, &strtoul_ptr, 10);
+				distance = strtod(user_selection_string, &strtod_ptr);
 				//printf("DEBUG: distance = %u\n", distance);
 
 				//printf("DEBUG: attempting to add neighbor");
@@ -390,7 +433,7 @@ int main(int argc, char *argv[])
 				// print all the connections it has
 				for(int i = 0; i < nodes[source_index]->neighbors_len; i++)
 				{
-					printf("\t\t[%d] %s --- distance: %u\n", i, (nodes[source_index])->neighbors[i]->name, (nodes[source_index])->distances[i]);
+					printf("\t\t[%d] %s --- distance: %f\n", i, (nodes[source_index])->neighbors[i]->name, (nodes[source_index])->distances[i]);
 				}
 				break;
 
@@ -406,7 +449,7 @@ int main(int argc, char *argv[])
 					// print all the connections it has
 					for(int j = 0; j < nodes[i]->neighbors_len; j++) 
 					{
-						printf("\t\t[%d] %s --- distance: %u\n", j, (nodes[i])->neighbors[j]->name, (nodes[i])->distances[j]);
+						printf("\t\t[%d] %s --- distance: %f\n", j, (nodes[i])->neighbors[j]->name, (nodes[i])->distances[j]);
 					}
 					printf("\n");
 				}
@@ -534,7 +577,7 @@ int main(int argc, char *argv[])
 					// go through all neighbors of the current node
 					for(int j = 0; j < nodes[i]->neighbors_len; j++)
 					{
-						fprintf(save_file, ",%s,%u", nodes[i]->neighbors[j]->name, nodes[i]->distances[j]);
+						fprintf(save_file, ",%s,%f", nodes[i]->neighbors[j]->name, nodes[i]->distances[j]);
 					}
 					// end the line
 					fprintf(save_file, "\n");
@@ -558,7 +601,7 @@ int main(int argc, char *argv[])
 					// (these are the only valid stopping points)
 					for(int i = 0; i < current_node->neighbors_len; i++)
 					{ 
-						printf("[%d] %s (distance = %u)\n", i, current_node->neighbors[i]->name, current_node->distances[i]);
+						printf("[%d] %s (distance = %f)\n", i, current_node->neighbors[i]->name, current_node->distances[i]);
 					}
 				}
 
@@ -579,13 +622,13 @@ int main(int argc, char *argv[])
 				{
 					total_distance_traveled += current_node->distances[user_selection];
 					nodes_visited++;
-					printf("Traveled from %s to %s. This trip was %u distance units\n", current_node->name, current_node->neighbors[user_selection]->name, current_node->distances[user_selection]);
+					printf("Traveled from %s to %s. This trip was %f distance units\n", current_node->name, current_node->neighbors[user_selection]->name, current_node->distances[user_selection]);
 					current_node = current_node->neighbors[user_selection];
 				}
 
 				// change node and print out route statistics
 				printf("\nCurrent node is now %s\n", current_node->name);
-				printf("Total distance traveled is now %u distance units.\n", total_distance_traveled);
+				printf("Total distance traveled is now %f distance units.\n", total_distance_traveled);
 				printf("You have visited %u nodes.\n", nodes_visited);
 				break;
 

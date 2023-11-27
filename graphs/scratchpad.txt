@@ -1,0 +1,62 @@
+1. Read a line
+2. tokenize the line
+3. add tokens to tokens buffer
+4. statements always follow the format
+	1. graph action
+	2. parameters
+	- certain actions follow specific orders --- we know what the order should be based on graph action. So we just look at tokens[0]
+		- node (create a new node)
+			1. node name
+		- edge (create a new edge between 2 nodes)
+			1. source node
+			2. destination node
+			3. distance
+			- notice that this connection will be unidirectional. You will have to establish the connection the other
+			  way around if you want it to be bidirectional
+
+
+
+
+nodes_len = 7
+
+a b c d e f g
+0 1 2 3 4 5 6
+
+a b c d   f g
+0 1 2 3 4 5 6
+
+i = 4
+4 < 6, so move
+
+a b c d f   g
+0 1 2 3 4 5 6
+
+i = 5
+5 < 6, so move
+
+a b c d f g
+0 1 2 3 4 5 6
+
+i = 6
+6 !< 6, so do not move 
+
+edges,Bossier City,Ruston,78,Shreveport,3
+0     1            2      3  4          5
+tokens_len = 6
+
+
+saving to a file (this will use the non-verbose syntax, with "edges" keyword)
+1. LOOP 1: go through all nodes, and for all nodes do the following: 
+	2. define the node in the output file, that is, add the line "node,NODE NAME"
+
+3. LOOP 2: go through all nodes, and for all nodes do the following: 
+	4. write a partial line (do not add \n) stating you are about to define all the
+	   connections to the current node --- write "edges,NODE NAME,"
+	5. LOOP 3: go through the neighbors buffer of the current node
+		6. add name of the neighbor to the line
+		7. add the distance to the line
+	6. add the newline character \n
+		
+		
+
+
